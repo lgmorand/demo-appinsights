@@ -2,7 +2,7 @@
 {
     public class SensitiveBase
     {
-        internal string Obfuscate(string strValue)
+        internal virtual string Obfuscate(string strValue)
         {
             return strValue;
         }
@@ -21,7 +21,7 @@
             return @enum.ToString();
         }
 
-        internal virtual string ObfuscateDefault(object value) {
+        internal string ObfuscateDefault(object value) {
             return value.ToString();
         }
     }
@@ -50,7 +50,7 @@
 
 
 
-        internal string Obfuscate(string strValue)
+        override internal string Obfuscate(string strValue)
         {
             return Truncate(strValue);
         }
@@ -88,6 +88,31 @@
         public SensitiveMaskChar(int? truncateAfter)
         {
             TruncateAfter = truncateAfter;
+        }
+
+        override internal string Obfuscate(string strValue)
+        {
+            return "****";
+        }
+
+        internal string Obfuscate(Guid guid)
+        {
+            return "****";
+        }
+
+        internal string Obfuscate(DateTime dateTime)
+        {
+            return "****";
+        }
+
+        internal string Obfuscate(Enum @enum)
+        {
+            return "****";
+        }
+
+        internal virtual string ObfuscateDefault(object value)
+        {
+            return "****";
         }
     }
 

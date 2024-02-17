@@ -41,6 +41,7 @@ namespace Demo.AppInsights.Api
 
             var processedProperties = new List<JsonProperty>();
 
+            // là on fait la magie en retraitant les champs sensibles
             foreach (JsonProperty baseProperty in baseProperties)
             {
                 if (sensitiveData.TryGetValue(baseProperty.PropertyName.ToUpperInvariant(), out SecureAttribute secureAttribute))
