@@ -12,7 +12,7 @@ namespace Demo.AppInsights.Api
         [JsonProperty("password")]
         public string Password { get; set;}
 
-        [Secure(ObfuscationType.HeadVisible,6)]
+        [Secure(ObfuscationType.HeadVisible, 6)]
         [JsonProperty("creditCard")]
         public string CreditCard { get; set;}
     }

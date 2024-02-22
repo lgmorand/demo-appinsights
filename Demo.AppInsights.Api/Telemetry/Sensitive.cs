@@ -76,11 +76,6 @@
         }
     }
 
-    public class SensitiveTailVisible : SensitiveBase
-    {
-        // todo
-    }
-
     public class SensitiveMaskChar : SensitiveBase
     {
         public int? TruncateAfter { get; set; }

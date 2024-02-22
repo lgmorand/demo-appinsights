@@ -3,7 +3,6 @@
     public enum ObfuscationType
     {
         HeadVisible,
-        TailVisible,
         MaskChar
     }
 
@@ -30,7 +29,6 @@
             return obfuscationType switch
             {
                 ObfuscationType.HeadVisible => new SensitiveHeadVisible(TruncateAfter),
-                ObfuscationType.TailVisible => new SensitiveTailVisible(),
                 ObfuscationType.MaskChar => new SensitiveMaskChar(TruncateAfter),
                 _ => throw new NotImplementedException($"None type {nameof(obfuscationType)}: {obfuscationType}")
             };
