@@ -38,22 +38,23 @@ namespace Demo.AppInsights.Functions.Api.Isolated
             {
                 var requestData = await context.GetHttpRequestDataAsync();
                 var body = await new StreamReader(requestData.Body).ReadToEndAsync();
-                //using (var scope = logger.BeginScope(new Dictionary<string, object>()
-                //                 { { "RequestBody", body } }))
-                //{
-                    logger.LogInformation("Request Body: {0} using logger", body);
-                //_logger.LogInformation("Request Body: {0} using _logger", body); // works but we lose operationId
-               // _telemetryClient.TrackTrace("Request Body using tele: ");
+
+                // une trace avec le logger
+                logger.LogInformation("Request Body: {0} using logger", body);
+               
+                // une trace
                 _telemetryClient.Context.GlobalProperties["RequestBody"] = body;
-                    _telemetryClient.TrackTrace("Request Body using tele2: ");
+                _telemetryClient.TrackTrace("Request Body using tele2: ");
+
+                // une request
                 RequestTelemetry requestTelemetry = new RequestTelemetry();
                 requestTelemetry.Name = context.FunctionDefinition.Name;
                 requestTelemetry.Url = requestData.Url;
                 requestTelemetry.Timestamp = DateTimeOffset.UtcNow;
-
                 _telemetryClient.TrackRequest(requestTelemetry);
+
+
                     await next(context);
-                //}
             }
             catch (Exception ex)
             {
