@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using Microsoft.Azure.Functions.Worker;
 using Microsoft.Azure.Functions.Worker.Http;
@@ -15,10 +16,10 @@ namespace Demo.AppInsights.Functions.Api.Isolated
             _logger = loggerFactory.CreateLogger<Function1>();
         }
 
-        [Function("Function1")]
+        [Function("FunctionLGM")]
         public HttpResponseData Run([HttpTrigger(AuthorizationLevel.Function, "get", "post")] HttpRequestData req)
         {
-            _logger.LogInformation("C# HTTP trigger function processed a request.");
+            //_logger.LogInformation("Method appelée + customDimensions");
 
             var response = req.CreateResponse(HttpStatusCode.OK);
             response.Headers.Add("Content-Type", "text/plain; charset=utf-8");

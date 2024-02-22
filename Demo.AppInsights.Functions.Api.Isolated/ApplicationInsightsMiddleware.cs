@@ -1,5 +1,6 @@
 ﻿using Microsoft.Azure.Functions.Worker.Middleware;
 using Microsoft.Azure.Functions.Worker;
+using Microsoft.Azure.Functions.Worker.Extensions.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,42 +8,58 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ApplicationInsights;
 using Microsoft.ApplicationInsights.Extensibility;
+using Microsoft.ApplicationInsights.DataContracts;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.Logging;
+using System.Diagnostics;
+using Azure.Core;
 
 namespace Demo.AppInsights.Functions.Api.Isolated
 {
     public class ApplicationInsightsMiddleware : IFunctionsWorkerMiddleware
     {
+        private readonly ILogger<ApplicationInsightsMiddleware> _logger;
         private readonly TelemetryClient _telemetryClient;
 
-        public ApplicationInsightsMiddleware()
+        public ApplicationInsightsMiddleware(ILogger<ApplicationInsightsMiddleware> logger)
         {
+            _logger = logger;
             var telemetryConfiguration = new TelemetryConfiguration
             {
-                InstrumentationKey = "<your_instrumentation_key>"
+                ConnectionString = "InstrumentationKey=35d75450-c663-4b81-9a31-dac81bb02625;IngestionEndpoint=https://westeurope-5.in.applicationinsights.azure.com/;LiveEndpoint=https://westeurope.livediagnostics.monitor.azure.com/"
             };
             _telemetryClient = new TelemetryClient(telemetryConfiguration);
         }
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
-            //var httpContext = context.GetHttpContext();
-            //   ?? throw new InvalidOperationException($"{nameof(context)} has no http context associated with it.");
+            var logger =  context.GetLogger(context.FunctionDefinition.Name);
+            try
+            {
+                var requestData = await context.GetHttpRequestDataAsync();
+                var body = await new StreamReader(requestData.Body).ReadToEndAsync();
+                //using (var scope = logger.BeginScope(new Dictionary<string, object>()
+                //                 { { "RequestBody", body } }))
+                //{
+                    logger.LogInformation("Request Body: {0} using logger", body);
+                //_logger.LogInformation("Request Body: {0} using _logger", body); // works but we lose operationId
+               // _telemetryClient.TrackTrace("Request Body using tele: ");
+                _telemetryClient.Context.GlobalProperties["RequestBody"] = body;
+                    _telemetryClient.TrackTrace("Request Body using tele2: ");
+                RequestTelemetry requestTelemetry = new RequestTelemetry();
+                requestTelemetry.Name = context.FunctionDefinition.Name;
+                requestTelemetry.Url = requestData.Url;
+                requestTelemetry.Timestamp = DateTimeOffset.UtcNow;
 
-            //context.GetHttpContext();
+                _telemetryClient.TrackRequest(requestTelemetry);
+                    await next(context);
+                //}
+            }
+            catch (Exception ex)
+            {
+                logger.LogError("Unexpected Error in {0}: {1}", context.FunctionDefinition.Name, ex.Message);
+            }
 
-            //if (context.InvocationFeatures.Get<IHttpRequestFeature>() is IHttpRequestFeature httpRequestFeature)
-            //{
-
-            //    var reader = new StreamReader(httpRequestFeature.Body);
-            //    var requestBody = await reader.ReadToEndAsync();
-            //    var requestTelemetry = context.Features.Get<RequestTelemetry>();
-            //    requestTelemetry?.Properties.Add("RequestBody", requestBody);
-
-            //    // Reset the stream so it's readable again
-            //    httpRequestFeature.Body.Position = 0;
-            //}
-
-            await next(context);
         }
     }
 }

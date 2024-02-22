@@ -12,7 +12,6 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddApplicationInsightsTelemetry();
 builder.Services.AddTransient<RequestBodyLoggingMiddleware>();
 builder.Services.AddTransient<ResponseBodyLoggingMiddleware>();
-//builder.Services.AddSingleton<ITelemetryInitializer, RequestBodyAndResponseBodyInitializer>();
 
 var app = builder.Build();
 
