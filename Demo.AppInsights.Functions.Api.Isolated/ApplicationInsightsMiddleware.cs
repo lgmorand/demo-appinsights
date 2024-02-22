@@ -25,7 +25,7 @@ namespace Demo.AppInsights.Functions.Api.Isolated
 
         public async Task Invoke(FunctionContext context, FunctionExecutionDelegate next)
         {
-            //HttpContext httpContext = context.GetHttpContext()
+            //var httpContext = context.GetHttpContext();
             //   ?? throw new InvalidOperationException($"{nameof(context)} has no http context associated with it.");
 
             //context.GetHttpContext();
